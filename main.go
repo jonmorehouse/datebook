@@ -10,6 +10,7 @@ import (
 	"errors"
 	"log"
 	"io/ioutil"
+	"strconv"
 )
 
 type Config struct {
@@ -28,8 +29,8 @@ func ParseConfig() error {
 
 	// fetch configuration settings from flags
 	var location = flag.String("location", "Local", "location to use")
-	var directory = flag.String("directory", fmt.Sprintf("%s/.go-backlog", usr.HomeDir), "Backlog directory. If this directory doesn't exist it will be created")
-	var template = flag.String("template", fmt.Sprintf("%s/.go-template.md", usr.HomeDir), "Template file for new backlog entries.")
+	var directory = flag.String("directory", fmt.Sprintf("%s/.datebook", usr.HomeDir), "Datebook directory. If this directory doesn't exist it will be created")
+	var template = flag.String("template", fmt.Sprintf("%s/.datebook.md", usr.HomeDir), "Template file for new datebook entries.")
 	flag.Parse()
 
 	loc, err := time.LoadLocation(*location)
@@ -38,13 +39,13 @@ func ParseConfig() error {
 		return errors.New(fmt.Sprintf("Invalid location %s", *location))
 	}
 
-	// attempt to create the backlog directory at boot time, erring out if we are unable to create it
+	// attempt to create the datebook directory at boot time, erring out if we are unable to create it
 	// NOTE ~ characters are expected to be expanded by the shell before getting to the application
 	if _, err := os.Stat(*directory); os.IsNotExist(err) {
 		err := os.Mkdir(*directory, 0755)
 		if err != nil {
 			log.Println(err)
-			return errors.New(fmt.Sprintf("Unable to create backlog directory"))
+			return errors.New(fmt.Sprintf("Unable to create datebook directory"))
 		}
 	}
 
@@ -73,22 +74,27 @@ func ParseDate(args []string) (time.Time, error) {
 }
 
 func Cleanup() error {
-	return nil
 	filepath := path.Join(AppConfig.directory, ".cleanup")
 	// NOOP if there is nothing to cleanup
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		return nil
 	}
 
+	// delete the cleanup file regardless of the outcome
+	defer os.Remove(filepath)
+
 	timestamp, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		return nil
+		return errors.New("Cleanup file corrupted")
 	}
 
-	fmt.Println(timestamp)
-
-	return nil
-
+	epoch, err := strconv.ParseInt(string(timestamp), 10, 64)
+	if err != nil {
+		return errors.New("Cleanup file corrupted")
+	}
+	date := time.Unix(epoch, 0)
+	entry := NewDayEntry(date)
+	return entry.Save()
 }
 
 func main() {
