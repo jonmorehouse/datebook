@@ -118,11 +118,7 @@ func (e DayEntry) commit() error {
 }
 
 func (e DayEntry) Print() error {
-	if err := e.createIfNotExists(); err != nil {
-		return err
-	}
-
-	if err := e.symlink(); err != nil {
+	if err := e.Prepare(); err != nil {
 		return err
 	}
 
@@ -146,11 +142,7 @@ func (e DayEntry) Print() error {
 }
 
 func (e DayEntry) Open() error {
-	if err := e.createIfNotExists(); err != nil {
-		return err
-	}
-
-	if err := e.week.WriteToDay(e.filepath()); err != nil {
+	if err := e.Prepare(); err != nil {
 		return err
 	}
 
@@ -166,6 +158,22 @@ func (e DayEntry) Open() error {
 	}
 
 	return e.Save()
+}
+
+func (e DayEntry) Prepare() error {
+	if err := e.createIfNotExists(); err != nil {
+		return err
+	}
+
+	if err := e.week.WriteToDay(e.filepath()); err != nil {
+		return err
+	}
+
+	if err := e.symlink(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (e DayEntry) Save() error {
