@@ -31,11 +31,9 @@ Here's what a `datebook` entry _could_ look like:
 
 * `$ datebook tomorrow`
 * `$ datebook today`
-* `$ datebook 2 weeks ago`
+* `$ datebook june 1st`
 * `$ datebook 4 months ago`
 * `$ datebook tuesday`
-* `$ datebook next week`
-* `$ datebook two weeks from today`
 
 ## Template File
 
@@ -81,6 +79,5 @@ This template would create `datebook` entries like the following:
 Your `datebook` is a place to keep track of things. Sometimes it is helpful to keep a few things around through the course of a week. Things such as checklists, reminders for later in the week and anything else that might not correspond to just a single day can be passed between `datebook` entries.
 
 By adding a `## week` block in any entry, each `datebook` entry that week will share said block.
-
 
 
