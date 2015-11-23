@@ -1,14 +1,14 @@
 package main
 
 import (
-	"time"
+	"errors"
 	"fmt"
-	"path"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"io/ioutil"
+	"path"
 	"strings"
-	"errors"
+	"time"
 )
 
 type DayEntry struct {
@@ -77,8 +77,10 @@ func (e DayEntry) symlink() error {
 		return nil
 	}
 
+	relativeFilepath := strings.Replace(e.filepath(), AppConfig.directory, "", 1)
+	os.Chdir(AppConfig.directory)
 	// we use a subprocess to symlink, in order to avoid having to delete the file and then re-symlink
-	command := exec.Command("ln", "-sf", e.filepath(), path.Join(AppConfig.directory, "README.md"))
+	command := exec.Command("ln", "-sf", relativeFilepath, "README.md")
 	if err := command.Run(); err != nil {
 		return err
 	}
@@ -118,11 +120,7 @@ func (e DayEntry) commit() error {
 }
 
 func (e DayEntry) Print() error {
-	if err := e.createIfNotExists(); err != nil {
-		return err
-	}
-
-	if err := e.symlink(); err != nil {
+	if err := e.Prepare(); err != nil {
 		return err
 	}
 
@@ -146,11 +144,7 @@ func (e DayEntry) Print() error {
 }
 
 func (e DayEntry) Open() error {
-	if err := e.createIfNotExists(); err != nil {
-		return err
-	}
-
-	if err := e.week.WriteToDay(e.filepath()); err != nil {
+	if err := e.Prepare(); err != nil {
 		return err
 	}
 
@@ -168,12 +162,28 @@ func (e DayEntry) Open() error {
 	return e.Save()
 }
 
+func (e DayEntry) Prepare() error {
+	if err := e.createIfNotExists(); err != nil {
+		return err
+	}
+
+	if err := e.week.WriteToDay(e.filepath()); err != nil {
+		return err
+	}
+
+	if err := e.symlink(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (e DayEntry) Save() error {
 	if err := e.week.SaveFromDay(e.filepath()); err != nil {
 		return err
 	}
 
-	if err := e.commit(); err != nil{
+	if err := e.commit(); err != nil {
 		return err
 	}
 

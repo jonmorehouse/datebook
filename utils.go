@@ -1,10 +1,10 @@
 package main
 
 import (
-	"time"
-	"path"
 	"fmt"
+	"path"
 	"strings"
+	"time"
 )
 
 func DateDirectory(date time.Time) string {
@@ -26,7 +26,7 @@ func StripNewLines(buf []byte) []byte {
 		break
 	}
 
-	for index := len(buf)- 1; index > startIndex; index-- {
+	for index := len(buf) - 1; index > startIndex; index-- {
 		if buf[index] != byte('\n') {
 			break
 		}
@@ -34,5 +34,5 @@ func StripNewLines(buf []byte) []byte {
 		rightOffset++
 	}
 
-	return buf[startIndex:len(buf) - rightOffset]
+	return buf[startIndex : len(buf)-rightOffset]
 }
