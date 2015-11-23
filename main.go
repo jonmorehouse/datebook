@@ -1,23 +1,27 @@
 package main
 
 import (
-	"time"
-	"flag"
-	"os"
-	"path"
-	"os/user"
-	"fmt"
 	"errors"
-	"log"
+	"flag"
+	"fmt"
 	"io/ioutil"
+	"log"
+	"os"
+	"os/user"
+	"path"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/jonmorehouse/datelp"
 )
 
 type Config struct {
-	location *time.Location
+	location  *time.Location
 	directory string
-	template string
+	template  string
 }
+
 var AppConfig *Config
 
 func ParseConfig() error {
@@ -50,9 +54,9 @@ func ParseConfig() error {
 	}
 
 	AppConfig = &Config{
-		location: loc,
+		location:  loc,
 		directory: *directory,
-		template: *template,
+		template:  *template,
 	}
 
 	return nil
@@ -62,13 +66,12 @@ func ParseDate(args []string) (time.Time, error) {
 	if len(args) == 0 {
 		return time.Now(), nil
 	}
-	
-	// this is temporary while we build out datelp
-	date := time.Now()
-	//date, err := datelp.Parse(args)
-	//if err != nil {
-		//return nil, err
-	//}
+
+	dateString := strings.Join(args, " ")
+	date, err := datelp.Parse(dateString)
+	if err != nil {
+		log.Fatalf("Passed in a date string that could not be parsed")
+	}
 
 	return date, nil
 }
@@ -118,7 +121,7 @@ func main() {
 	}
 
 	entry := NewDayEntry(date)
-	
+
 	// initialize the method based upon input parameters
 	var method func() error
 	switch {
@@ -135,6 +138,4 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-
 }
-

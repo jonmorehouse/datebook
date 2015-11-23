@@ -1,13 +1,13 @@
 package main
 
 import (
-	"time"
-	"path"
 	"fmt"
-	"strings"
-	"regexp"
 	"io/ioutil"
 	"os"
+	"path"
+	"regexp"
+	"strings"
+	"time"
 )
 
 type WeekEntry struct {
@@ -19,8 +19,8 @@ func (w *WeekEntry) weekBounds() (time.Time, time.Time) {
 
 	// calculate the offset into the current week we are and use that as
 	// the basis for creating the first/last day of the week
-	left := w.date.AddDate(0, 0, int(current) * -1)
-	right := w.date.AddDate(0, 0, 7 - current)
+	left := w.date.AddDate(0, 0, int(current)*-1)
+	right := w.date.AddDate(0, 0, 7-current)
 
 	return left, right
 }

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"time"
+	"errors"
 	"fmt"
-	"path"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"io/ioutil"
+	"path"
 	"strings"
-	"errors"
+	"time"
 )
 
 type DayEntry struct {
@@ -183,7 +183,7 @@ func (e DayEntry) Save() error {
 		return err
 	}
 
-	if err := e.commit(); err != nil{
+	if err := e.commit(); err != nil {
 		return err
 	}
 
