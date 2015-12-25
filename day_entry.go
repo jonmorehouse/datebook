@@ -110,7 +110,7 @@ func (e DayEntry) commit() error {
 		return nil
 	}
 
-	command = exec.Command("git", "commit", "-m", fmt.Sprintf("\"%s\"", commitMessage))
+	command = exec.Command("git", "commit", "-m", fmt.Sprintf("%s", commitMessage))
 	if err := command.Run(); err != nil {
 		return err
 	}
