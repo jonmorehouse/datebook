@@ -77,7 +77,7 @@ func (e DayEntry) symlink() error {
 		return nil
 	}
 
-	relativeFilepath := strings.Replace(e.filepath(), AppConfig.directory, "", 1)
+	relativeFilepath := strings.Replace(e.filepath(), AppConfig.directory, ".", 1)
 	os.Chdir(AppConfig.directory)
 	// we use a subprocess to symlink, in order to avoid having to delete the file and then re-symlink
 	command := exec.Command("ln", "-sf", relativeFilepath, "README.md")
